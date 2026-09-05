@@ -256,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     <?php endif; ?>
 
-    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="POST">
+    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>" method="POST" id="loginForm">
       <div class="form-group">
         <label for="email">Email Address</label>
         <div class="input-wrapper">
@@ -305,6 +305,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
       togglePassword.classList.toggle('bx-show');
       togglePassword.classList.toggle('bx-hide');
+    });
+
+    // Local Storage API Integration for Sign-In Email
+    document.addEventListener("DOMContentLoaded", function () {
+        const emailInput = document.getElementById("email");
+
+        // Restore email from localStorage if the input is currently empty
+        if (!emailInput.value && localStorage.getItem("signin_email")) {
+            emailInput.value = localStorage.getItem("signin_email");
+        }
+
+        // Save email to localStorage dynamically as the user types
+        emailInput.addEventListener("input", function () {
+            localStorage.setItem("signin_email", emailInput.value);
+        });
     });
   </script>
 </body>
