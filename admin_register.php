@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($created) {
                 $success = "Admin account registered successfully! You can now log in.";
                 $username = $email = '';
+                // Flag to clear local storage via JS upon success
+                $clearStorage = true;
             } else {
                 $errors[] = "An unexpected error occurred. Please try again.";
             }
@@ -110,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
 
                     <!-- Registration Form -->
-                    <form action="admin_register.php" method="POST" autocomplete="off">
+                    <form action="admin_register.php" method="POST" autocomplete="off" id="registerForm">
                         
                         <!-- Username -->
                         <div class="mb-3">
@@ -197,5 +199,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Local Storage API Integration Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const usernameInput = document.getElementById("username");
+        const emailInput = document.getElementById("email");
+        const registerForm = document.getElementById("registerForm");
+
+        <?php if (!empty($clearStorage)): ?>
+            // Clear local storage upon successful registration
+            localStorage.removeItem("admin_reg_username");
+            localStorage.removeItem("admin_reg_email");
+        <?php else: ?>
+            // Restore values from localStorage if they exist and fields are empty
+            if (!usernameInput.value && localStorage.getItem("admin_reg_username")) {
+                usernameInput.value = localStorage.getItem("admin_reg_username");
+            }
+            if (!emailInput.value && localStorage.getItem("admin_reg_email")) {
+                emailInput.value = localStorage.getItem("admin_reg_email");
+            }
+        <?php endif; ?>
+
+        // Save values to localStorage on input change
+        usernameInput.addEventListener("input", function () {
+            localStorage.setItem("admin_reg_username", usernameInput.value);
+        });
+
+        emailInput.addEventListener("input", function () {
+            localStorage.setItem("admin_reg_email", emailInput.value);
+        });
+    });
+</script>
 </body>
 </html>
