@@ -49,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = '🎉 Account created successfully! You can now log in.';
                 $message_type = 'success';
 
+                // Flag to clear localStorage in JavaScript upon successful registration
+                $clearStorage = true;
+
                 // Clear post variables after successful insert
                 $_POST = [];
             }
@@ -123,13 +126,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endif; ?>
 
-                    <form action="register.php" method="POST" autocomplete="off">
+                    <form action="register.php" method="POST" autocomplete="off" id="userRegisterForm">
                         <!-- Full Name -->
                         <div class="mb-3">
                             <label class="form-label small fw-semibold text-secondary">👤 Full Name</label>
                             <div class="input-group">
                                 <span class="input-group-text">📝</span>
-                                <input type="text" name="fullname" class="form-control" placeholder="John Doe" value="<?= htmlspecialchars($_POST['fullname'] ?? '') ?>" required>
+                                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="John Doe" value="<?= htmlspecialchars($_POST['fullname'] ?? '') ?>" required>
                             </div>
                         </div>
 
@@ -138,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="form-label small fw-semibold text-secondary">📧 Email Address</label>
                             <div class="input-group">
                                 <span class="input-group-text">✉️</span>
-                                <input type="email" name="email" class="form-control" placeholder="sample@example.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
+                                <input type="email" id="email" name="email" class="form-control" placeholder="sample@example.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
                             </div>
                         </div>
 
@@ -147,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label class="form-label small fw-semibold text-secondary">🏷️ Username</label>
                             <div class="input-group">
                                 <span class="input-group-text">@</span>
-                                <input type="text" name="username" class="form-control" placeholder="johndoe" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required>
+                                <input type="text" id="username" name="username" class="form-control" placeholder="johndoe" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required>
                             </div>
                         </div>
 
@@ -188,5 +191,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Local Storage API Script Integration -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fullnameInput = document.getElementById("fullname");
+        const emailInput = document.getElementById("email");
+        const usernameInput = document.getElementById("username");
+
+        <?php if (!empty($clearStorage)): ?>
+            // Clear local storage entries upon a successful submission
+            localStorage.removeItem("user_reg_fullname");
+            localStorage.removeItem("user_reg_email");
+            localStorage.removeItem("user_reg_username");
+        <?php else: ?>
+            // Restore values from localStorage if input elements are currently empty
+            if (!fullnameInput.value && localStorage.getItem("user_reg_fullname")) {
+                fullnameInput.value = localStorage.getItem("user_reg_fullname");
+            }
+            if (!emailInput.value && localStorage.getItem("user_reg_email")) {
+                emailInput.value = localStorage.getItem("user_reg_email");
+            }
+            if (!usernameInput.value && localStorage.getItem("user_reg_username")) {
+                usernameInput.value = localStorage.getItem("user_reg_username");
+            }
+        <?php endif; ?>
+
+        // Listen for input changes and continuously update local storage
+        fullnameInput.addEventListener("input", function () {
+            localStorage.setItem("user_reg_fullname", fullnameInput.value);
+        });
+
+        emailInput.addEventListener("input", function () {
+            localStorage.setItem("user_reg_email", emailInput.value);
+        });
+
+        usernameInput.addEventListener("input", function () {
+            localStorage.setItem("user_reg_username", usernameInput.value);
+        });
+    });
+</script>
 </body>
 </html>
